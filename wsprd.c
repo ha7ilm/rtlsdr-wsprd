@@ -39,6 +39,7 @@
 #include <stdint.h>
 #include <time.h>
 #include <fftw3.h>
+#include <sched.h>
 
 #include "wsprd.h"
 #include "fano.h"
@@ -527,6 +528,8 @@ int32_t wspr_decode(float *idat, float *qdat, uint32_t npoints,
             }
         }
 
+		sched_yield();
+
         // Compute average spectrum
         float psavg[512]= {0};
         for (i=0; i<nffts; i++) {
@@ -534,6 +537,8 @@ int32_t wspr_decode(float *idat, float *qdat, uint32_t npoints,
                 psavg[j]=psavg[j]+ps[j][i];
             }
         }
+
+		sched_yield();
 
         // Smooth with 7-point window and limit spectrum to +/-150 Hz
         int32_t window[7]= {1,1,1,1,1,1,1};
@@ -555,6 +560,8 @@ int32_t wspr_decode(float *idat, float *qdat, uint32_t npoints,
 
         // Noise level of spectrum is estimated as 123/411= 30'th percentile
         float noise_level = tmpsort[122];
+
+		sched_yield();
 
         /* Renormalize spectrum so that (large) peaks represent an estimate of snr.
          * We know from experience that threshold snr is near -7dB in wspr bandwidth,
@@ -623,6 +630,8 @@ int32_t wspr_decode(float *idat, float *qdat, uint32_t npoints,
             }
         }
 
+		sched_yield();
+
         /* Make coarse estimates of shift (DT), freq, and drift
          * Look for time offsets up to +/- 8 symbols (about +/- 5.4 s) relative
            to nominal start time, which is 2 seconds into the file
@@ -678,6 +687,8 @@ int32_t wspr_decode(float *idat, float *qdat, uint32_t npoints,
                 }
             }
         }
+
+		sched_yield();
 
         /*
          Refine the estimates of freq, shift using sync as a metric.
@@ -824,6 +835,7 @@ int32_t wspr_decode(float *idat, float *qdat, uint32_t npoints,
                 }
             }
         }
+		sched_yield();
     }
 
     // sort the result

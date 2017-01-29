@@ -30,7 +30,6 @@
 
 #pragma once
 
-
 /* Option & config of decoder (Shared with the wsprd code) */
 struct decoder_options {
     uint32_t freq;         // Dial frequency
